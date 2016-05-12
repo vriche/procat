@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProAudienceRatingsDao">
+    
+	<sql id="proAudienceRatingsColumns">
+		a.id AS "id",
+
+		a.office_id AS "office.id",
+		a.pro_audience_source_id AS "proAudienceSource.id",
+		a.pro_audience_city_id AS "proAudienceCity.id",
+		a.pro_audience_carrier_id AS "proAudienceCarrier.id",
+		a.pro_base_info_id AS "proBaseInfo.id",
+		
+		a.bro_date AS "broDate",
+		a.crown_name AS "crownName",
+		a.bro_time_start AS "broTimeStart",
+		a.bro_time_end AS "broTimeEnd",
+		
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+				
+		o2.name AS "office.name",
+				
+		a3.name AS "proAudienceSource.name",
+				
+		a4.name AS "proAudienceCity.name",
+				
+		a5.name AS "proAudienceCarrier.name",
+				
+		a6.name AS "proBaseInfo.name"
+	</sql>
+	
+	<sql id="proAudienceRatingsJoins">
+		LEFT JOIN pro_audience_source a3 ON a3.id = a.pro_audience_source_id
+		LEFT JOIN pro_audience_city a4 ON a4.id = a.pro_audience_city_id			
+		LEFT JOIN pro_audience_carrier a5 ON a5.id = a.pro_audience_carrier_id	
+		LEFT JOIN pro_base_info a6 ON a6.id = a.pro_base_info_id	
+		LEFT JOIN sys_office o2 ON o2.id = a.office_id 
+	</sql>
+    
+	<select id="get" resultType="ProAudienceRatings">
+		SELECT 
+			<include refid="proAudienceRatingsColumns"/>
+		FROM pro_audience_ratings a
+		<include refid="proAudienceRatingsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProAudienceRatings">
+		SELECT 
+			<include refid="proAudienceRatingsColumns"/>
+		FROM pro_audience_ratings a
+		<include refid="proAudienceRatingsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="proAudienceSource != null and proAudienceSource.id != null and proAudienceSource.id != ''">
+				AND a.pro_audience_source_id = #{proAudienceSource.id}
+			</if>
+			<if test="proAudienceCity != null and proAudienceCity.id != null and proAudienceCity.id != ''">
+				AND a.pro_audience_city_id = #{proAudienceCity.id}
+			</if>
+			<if test="proAudienceCarrier != null and proAudienceCarrier.id != null and proAudienceCarrier.id != ''">
+				AND a.pro_audience_carrier_id = #{proAudienceCarrier.id}
+			</if>
+			<if test="proBaseInfo != null and proBaseInfo.id != null and proBaseInfo.id != ''">
+				AND a.pro_base_info_id = #{proBaseInfo.id}
+			</if>
+			<if test="beginBroDate != null and endBroDate != null and beginBroDate != '' and endBroDate != ''">
+				AND a.bro_date BETWEEN #{beginBroDate} AND #{endBroDate}
+			</if>
+			<if test="crownName != null and crownName != ''">
+				AND a.crown_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{crownName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{crownName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{crownName},'%')</if>
+			</if>		
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProAudienceRatings">
+		SELECT 
+			<include refid="proAudienceRatingsColumns"/>
+		FROM pro_audience_ratings a
+		<include refid="proAudienceRatingsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_audience_ratings(
+			id,
+			office_id,
+			pro_audience_source_id,
+			pro_audience_city_id,
+			pro_audience_carrier_id,
+			pro_base_info_id,
+			bro_date,
+			crown_name,
+			bro_time_start,
+			bro_time_end,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{proAudienceSource.id},
+			#{proAudienceCity.id},
+			#{proAudienceCarrier.id},
+			#{proBaseInfo.id},
+			#{broDate},
+			#{crownName},
+			#{broTimeStart},
+			#{broTimeEnd},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pro_audience_ratings SET 	
+			office_id = #{office.id},
+			pro_audience_source_id = #{proAudienceSource.id},
+			pro_audience_city_id = #{proAudienceCity.id},
+			pro_audience_carrier_id = #{proAudienceCarrier.id},
+			pro_base_info_id = #{proBaseInfo.id},
+			bro_date = #{broDate},
+			crown_name = #{crownName},
+			bro_time_start = #{broTimeStart},
+			bro_time_end = #{broTimeEnd},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_audience_ratings SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

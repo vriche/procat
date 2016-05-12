@@ -1,0 +1,26 @@
+2016/05/11
+1、在package com.thinkgem.jeesite.common.utils 下增加 IdWorker 类用于生成数字ID
+2、在package com.thinkgem.jeesite.common.utils 修改 DataEntity 的 public void preInsert() 
+   注释了
+     		setId(IdGen.uuid());
+   增加 		
+			 IdWorker worker1 = new IdWorker(1);
+			 long id = worker1.nextId();
+			 System.out.println(worker1.nextId());
+			 setId(String.valueOf(id));
+			 
+			 
+3、修改pom.xml  增加 webserver.port2=8080
+
+2016/07/03
+1、简介加一个超连接属性
+2、返回按纽放上边
+3、输入时码时自动补冒号
+4、按纽变兰色
+5、总信息与简码需要分割
+6、根据集数，自动增加版本，自动增加行
+7、增加一个按钮，自动生成条形码
+8、导演改演员
+9、入库，节目名与助记码合并成一个
+10、名称排序
+			 

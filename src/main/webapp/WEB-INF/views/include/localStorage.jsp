@@ -1,0 +1,1 @@
+<script src="${ctxStatic}/localStorage/store.min.js" type="text/javascript"></script>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProAudienceRatingsDetailDao">
+    
+	<sql id="proAudienceRatingsDetailColumns">
+		a.id AS "id",
+		a.pro_audience_target_id AS "proAudienceTarget.id",
+		a.audience_rate AS "audienceRate",
+		a.market_rate AS "marketRate",
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		
+		a2.id AS "proAudienceRatings.id",
+		a2.office_id AS "proAudienceRatings.office.id",
+		a2.pro_audience_source_id AS "proAudienceRatings.proAudienceSource.id",
+		a2.pro_audience_city_id AS "proAudienceRatings.proAudienceCity.id",
+		a2.pro_audience_carrier_id AS "proAudienceRatings.proAudienceCarrier.id",
+		a2.pro_base_info_id AS "proAudienceRatings.proBaseInfo.id",
+		a2.bro_date AS "proAudienceRatings.broDate",
+		a2.crown_name AS "proAudienceRatings.crownName",
+		a2.bro_time_start AS "proAudienceRatings.broTimeStart",
+		a2.bro_time_end AS "proAudienceRatings.broTimeEnd",		
+		
+				
+		o2.name AS "proAudienceRatings.office.name",		
+		a3.name AS "proAudienceTarget.name",
+		a4.name AS "proAudienceRatings.proBaseInfo.name",
+		a5.name AS "proAudienceRatings.proAudienceSource.name",
+		a6.name AS "proAudienceRatings.proAudienceCity.name",		
+		a7.name AS "proAudienceRatings.proAudienceCarrier.name"
+	</sql>
+	
+	<sql id="proAudienceRatingsDetailJoins">
+		LEFT JOIN pro_audience_ratings a2 ON a2.id = a.pro_audience_ratings_id	
+		LEFT JOIN pro_audience_target a3 ON a3.id = a.pro_audience_target_id	
+
+		LEFT JOIN pro_base_info a4 ON a4.id = a2.pro_base_info_id	
+		LEFT JOIN pro_audience_source a5 ON a5.id = a2.pro_audience_source_id
+		LEFT JOIN pro_audience_city a6 ON a6.id = a2.pro_audience_city_id			
+		LEFT JOIN pro_audience_carrier a7 ON a7.id = a2.pro_audience_carrier_id	
+		LEFT JOIN sys_office o2 ON o2.id = a2.office_id
+	</sql>
+    
+	<select id="get" resultType="ProAudienceRatingsDetail">
+		SELECT 
+			<include refid="proAudienceRatingsDetailColumns"/>
+		FROM pro_audience_ratings_detail a
+		<include refid="proAudienceRatingsDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProAudienceRatingsDetail">
+		SELECT 
+			<include refid="proAudienceRatingsDetailColumns"/>
+		FROM pro_audience_ratings_detail a
+		<include refid="proAudienceRatingsDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			
+		<if test="proAudienceRatings != null">
+				
+			<if test="proAudienceRatings.proBaseInfo != null and proAudienceRatings.proBaseInfo.id != null and proAudienceRatings.proBaseInfo.id != ''">
+				AND a2.pro_base_info_id = #{proAudienceRatings.proBaseInfo.id}
+			</if>		
+			<if test="proAudienceRatings.proAudienceSource != null and proAudienceRatings.proAudienceSource.id != null and proAudienceRatings.proAudienceSource.id != ''">
+				AND a2.pro_audience_source_id = #{proAudienceRatings.proAudienceSource.id}
+			</if>
+			<if test="proAudienceRatings.proAudienceCity != null and proAudienceRatings.proAudienceCity.id != null and proAudienceRatings.proAudienceCity.id != ''">
+				AND a2.pro_audience_city_id = #{proAudienceRatings.proAudienceCity.id}
+			</if>
+			<if test="proAudienceRatings.proAudienceCarrier != null and proAudienceRatings.proAudienceCarrier.id != null and proAudienceRatings.proAudienceCarrier.id != ''">
+				AND a2.pro_audience_carrier_id = #{proAudienceRatings.proAudienceCarrier.id}
+			</if>
+			
+			<if test="proAudienceRatings.beginBroDate != null and proAudienceRatings.endBroDate != null and proAudienceRatings.beginBroDate != '' and proAudienceRatings.endBroDate != ''">
+				AND a2.bro_date BETWEEN #{proAudienceRatings.beginBroDate} AND #{proAudienceRatings.endBroDate}
+			</if>
+			
+			
+			<if test="proAudienceRatings.crownName != null and proAudienceRatings.crownName != ''">
+				AND a2.crown_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{proAudienceRatings.crownName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{proAudienceRatings.crownName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{proAudienceRatings.crownName},'%')</if>
+			</if>			
+			
+	
+		</if>
+			
+			 <if test="proAudienceTarget != null and proAudienceTarget.id != null and proAudienceTarget.id != ''">
+				AND a.pro_audience_target_id = #{proAudienceTarget.id}
+			</if>
+			<if test="beginAudienceRate != null and endBAudienceRate != null and beginAudienceRate != '' and endBAudienceRate != ''">
+				AND a.audience_rate BETWEEN #{beginAudienceRate} AND #{endBAudienceRate}
+			</if>
+
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProAudienceRatingsDetail">
+		SELECT 
+			<include refid="proAudienceRatingsDetailColumns"/>
+		FROM pro_audience_ratings_detail a
+		<include refid="proAudienceRatingsDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_audience_ratings_detail(
+			id,
+			pro_audience_ratings_id,
+			pro_audience_target_id,
+			audience_rate,
+			market_rate,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{proAudienceRatings.id},
+			#{proAudienceTarget.id},
+			#{audienceRate},
+			#{marketRate},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pro_audience_ratings_detail SET 	
+			pro_audience_ratings_id = #{proAudienceRatings.id},
+			pro_audience_target_id = #{proAudienceTarget.id},
+			audience_rate = #{audienceRate},
+			market_rate = #{marketRate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_audience_ratings_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE pro_audience_ratings_id = #{proAudienceRatings.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

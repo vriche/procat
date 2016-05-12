@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProTapeBroDao">
+    
+	<sql id="proTapeBroColumns">
+		a.id AS "id",
+		a.pro_version_id AS "proVersion.id",
+		a.cur_episode AS "curEpisode",
+		a.bar_code AS "barCode",
+		a.tape_code AS "tapeCode",
+		a.sound AS "sound",
+		a.definition AS "definition",
+		a.complete_total_time AS "completeTotalTime",
+		a.complete_frist_tc_code AS "completeFristTcCode",
+		a.complete_frist_tc_info AS "completeFristTcInfo",
+		a.complete_last_tc_code AS "completeLastTcCode",
+		a.complete_last_tc_info AS "completeLastTcInfo",
+		a.simple_total_time AS "simpleTotalTime",
+		a.simple_frist_tc_code AS "simpleFristTcCode",
+		a.simple_frist_tc_info AS "simpleFristTcInfo",
+		a.simple_last_tc_code AS "simpleLastTcCode",
+		a.simple_last_tc_info AS "simpleLastTcInfo",
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+				
+		b.name AS "proVersion.name", 
+		c.name AS "proVersion.proBaseInfo.name"
+	</sql>
+	
+	<sql id="proTapeBroJoins">
+		LEFT JOIN pro_version b ON b.id = a.pro_version_id  
+		LEFT JOIN pro_base_info c ON c.id = b.pro_base_info_id 
+	</sql>
+    
+	<select id="get" resultType="ProTapeBro">
+		SELECT 
+			<include refid="proTapeBroColumns"/>
+		FROM pro_tape_bro a
+		<include refid="proTapeBroJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProTapeBro">
+		SELECT 
+			<include refid="proTapeBroColumns"/>
+		FROM pro_tape_bro a
+		<include refid="proTapeBroJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="proVersion != null and proVersion.id != null and proVersion.id != ''">
+				AND a.pro_version_id = #{proVersion.id}
+   
+				<if test="proVersion.proBaseInfo != null and proVersion.proBaseInfo.id != null and proVersion.proBaseInfo.id != ''">
+					AND c.id = #{proVersion.proBaseInfo.id}
+				</if>
+				
+			</if>
+			
+			
+			<if test="barCode != null and barCode != ''">
+				AND a.bar_code = #{barCode}
+			</if>
+			
+			
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProTapeBro">
+		SELECT 
+			<include refid="proTapeBroColumns"/>
+		FROM pro_tape_bro a
+		<include refid="proTapeBroJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_tape_bro(
+			id,
+			pro_version_id,
+			cur_episode,
+			bar_code,
+			tape_code,
+			sound,
+			definition,
+			complete_total_time,
+			complete_frist_tc_code,
+			complete_frist_tc_info,
+			complete_last_tc_code,
+			complete_last_tc_info,
+			simple_total_time,
+			simple_frist_tc_code,
+			simple_frist_tc_info,
+			simple_last_tc_code,
+			simple_last_tc_info,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{proVersion.id},
+			#{curEpisode},
+			#{barCode},
+			#{tapeCode},
+			#{sound},
+			#{definition},
+			#{completeTotalTime},
+			#{completeFristTcCode},
+			#{completeFristTcInfo},
+			#{completeLastTcCode},
+			#{completeLastTcInfo},
+			#{simpleTotalTime},
+			#{simpleFristTcCode},
+			#{simpleFristTcInfo},
+			#{simpleLastTcCode},
+			#{simpleLastTcInfo},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pro_tape_bro SET 	
+			pro_version_id = #{proVersion.id},
+			cur_episode = #{curEpisode},
+			bar_code = #{barCode},
+			tape_code = #{tapeCode},
+			sound = #{sound},
+			definition = #{definition},
+			complete_total_time = #{completeTotalTime},
+			complete_frist_tc_code = #{completeFristTcCode},
+			complete_frist_tc_info = #{completeFristTcInfo},
+			complete_last_tc_code = #{completeLastTcCode},
+			complete_last_tc_info = #{completeLastTcInfo},
+			simple_total_time = #{simpleTotalTime},
+			simple_frist_tc_code = #{simpleFristTcCode},
+			simple_frist_tc_info = #{simpleFristTcInfo},
+			simple_last_tc_code = #{simpleLastTcCode},
+			simple_last_tc_info = #{simpleLastTcInfo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_tape_bro SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE pro_version_id = #{proVersion.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>
