@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProContractDao">
+    
+	<sql id="proContractColumns">
+		a.id AS "id",
+		a.pro_base_info_id AS "proBaseInfo.id",
+		a.content AS "content",
+		a.pic AS "pic",
+		a.sign_date AS "signDate",
+		a.sign_person AS "signPerson",
+		a.sort AS "sort",
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+				
+				
+		b.name AS "proBaseInfo.name"
+	</sql>
+	
+	<sql id="proContractJoins">
+		LEFT JOIN pro_base_info b ON b.id = a.pro_base_info_id
+	</sql>
+    
+	<select id="get" resultType="ProContract">
+		SELECT 
+			<include refid="proContractColumns"/>
+		FROM pro_contract a
+		<include refid="proContractJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProContract">
+		SELECT 
+			<include refid="proContractColumns"/>
+		FROM pro_contract a
+		<include refid="proContractJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="proBaseInfo != null and proBaseInfo.id != null and proBaseInfo.id != ''">
+				AND a.pro_base_info_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{proBaseInfo.id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{proBaseInfo.id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{proBaseInfo.id},'%')</if>
+			</if>
+			<if test="signDate != null and signDate != ''">
+				AND a.sign_date = #{signDate}
+			</if>
+			<if test="signPerson != null and signPerson != ''">
+				AND a.sign_person = #{signPerson}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProContract">
+		SELECT 
+			<include refid="proContractColumns"/>
+		FROM pro_contract a
+		<include refid="proContractJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_contract(
+			id,
+			pro_base_info_id,
+			content,
+			pic,
+			sign_date,
+			sign_person,
+			sort,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{proBaseInfo.id},
+			#{content},
+			#{pic},
+			#{signDate},
+			#{signPerson},
+			#{sort},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pro_contract SET 	
+			pro_base_info_id = #{proBaseInfo.id},
+			content = #{content},
+			pic = #{pic},
+			sign_date = #{signDate},
+			sign_person = #{signPerson},
+			sort = #{sort},
+			version = #{version},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_contract SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE pro_base_info_id = #{proBaseInfo.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

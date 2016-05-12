@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProBaseInfoDao">
+    
+	<sql id="proBaseInfoColumns">
+		a.id AS "id",
+		a.office_id AS "office.id",
+		a.name AS "name",
+		a.name_en AS "nameEn",
+		a.name_alias AS "nameAlias",
+		a.code AS "code",
+		a.help_code AS "helpCode",
+		a.pro_class_id AS "proClass.id",
+		a.pro_plot_aspect_id AS "proPlotAspect.id",
+		a.pro_dubbing_language_id AS "proDubbingLanguag.id",
+		a.pro_country_id AS "proCountry.id",
+		a.pro_grade_id AS "proGrade.id",
+		a.director AS "director",
+		a.pro_issue_year_id AS "proIssueYear.id",
+		a.performer AS "performer",
+		a.sort AS "sort",
+		a.total_episode AS "totalEpisode",
+		a.is_preview AS "isPreview",
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.relation AS "relation",
+		a.is_limit AS "isLimit",
+		
+
+		o2.name AS "office.name",
+	
+		a8.name AS "proClass.name",
+				
+		a9.name AS "proPlotAspect.name",
+				
+		a10.name AS "proDubbingLanguag.name",
+				
+		a11.name AS "proCountry.name",
+				
+		a12.name AS "proGrade.name",
+				
+				
+		a14.name AS "proIssueYear.name"
+	</sql>
+	
+	<sql id="proBaseInfoJoins">
+		LEFT JOIN sys_office o2 ON o2.id = a.office_id
+		LEFT JOIN pro_class a8 ON a8.id = a.pro_class_id		
+		LEFT JOIN pro_plot_aspect a9 ON a9.id = a.pro_plot_aspect_id		
+		LEFT JOIN pro_dubbing_language a10 ON a10.id = a.pro_dubbing_language_id		
+		LEFT JOIN pro_country a11 ON a11.id = a.pro_country_id				
+		LEFT JOIN pro_grade a12 ON a12.id = a.pro_grade_id			
+		LEFT JOIN pro_issue_year a14 ON a14.id = a.pro_issue_year_id	
+		
+	</sql>
+    
+	<select id="get" resultType="ProBaseInfo">
+		SELECT 
+			<include refid="proBaseInfoColumns"/>
+		FROM pro_base_info a
+		<include refid="proBaseInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProBaseInfo">
+		SELECT 
+			<include refid="proBaseInfoColumns"/>
+		FROM pro_base_info a
+		<include refid="proBaseInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			
+			<if test="isLimit != null and isLimit != ''">
+				AND a.is_limit = #{isLimit} 
+			</if> 
+			
+			<if test="name != null and name != ''">
+				AND (a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					OR a.help_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					OR a.name_en LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					OR a.director LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					OR a.performer LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+					)
+			</if> 
+			<if test="nameEn != null and nameEn != ''">
+				AND a.name_en LIKE 
+					<if test="dbName == 'oracle'">'%'||#{nameEn}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nameEn}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nameEn},'%')</if>
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="helpCode != null and helpCode != ''">
+				AND a.help_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{helpCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{helpCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{helpCode},'%')</if>
+			</if>
+
+
+			<if test="proDubbingLanguag != null and proDubbingLanguag.id != null and proDubbingLanguag.id != ''">
+				AND a.pro_dubbing_language_id = #{proDubbingLanguag.id}
+			</if>
+			<if test="proPlotAspect != null and proPlotAspect.id != null and proPlotAspect.id != ''">
+				AND (a.pro_plot_aspect_id = #{proPlotAspect.id} or a9.parent_id = #{proPlotAspect.id})
+			</if>
+			<if test="proClass != null and proClass.id != null and proClass.id != ''">
+				AND (a.pro_class_id = #{proClass.id} or a8.parent_id = #{proClass.id})
+			</if>
+			<if test="proCountry != null and proCountry.id != null and proCountry.id != ''">
+				AND (a.pro_country_id = #{proCountry.id} or a11.parent_id = #{proCountry.id})
+			</if>
+			<if test="proIssueYear != null and proIssueYear.id != null and proIssueYear.id != ''">
+				AND (a.pro_issue_year_id = #{proIssueYear.id} or a14.parent_id = #{proIssueYear.id})
+			</if>
+			<if test="proGrade != null and proGrade.id != null and proGrade.id != ''">
+				AND a.pro_grade_id = #{proGrade.id}
+			</if>
+			<if test="director != null and director != ''">
+				AND a.director LIKE 
+					<if test="dbName == 'oracle'">'%'||#{director}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{director}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{director},'%')</if>
+			</if>
+
+			<if test="performer != null and performer != ''">
+				AND a.performer LIKE 
+					<if test="dbName == 'oracle'">'%'||#{performer}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{performer}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{performer},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.name DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProBaseInfo">
+		SELECT 
+			<include refid="proBaseInfoColumns"/>
+		FROM pro_base_info a
+		<include refid="proBaseInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_base_info(
+			is_limit,
+			relation,
+			id,
+			office_id,
+			name,
+			name_en,
+			name_alias,
+			code,
+			help_code,
+			
+			
+			<if test="proClass !=null and proClass.id !='' ">
+           		pro_class_id,
+        	</if>
+			<if test="proPlotAspect !=null and proPlotAspect.id !='' ">
+           		pro_plot_aspect_id,
+        	</if>		
+			<if test="proDubbingLanguag !=null and proDubbingLanguag.id !='' ">
+           		pro_dubbing_language_id,
+        	</if>	
+			<if test="proCountry !=null and proCountry.id !='' ">
+           		pro_country_id,
+        	</if>		
+        	<if test="proGrade !=null and proGrade.id !='' ">
+           		pro_grade_id,
+        	</if>				
+        	<if test="proIssueYear !=null and proIssueYear.id !='' ">
+           		pro_issue_year_id,
+        	</if>				
+					
+			director,
+			performer,
+			sort,
+			total_episode,
+			is_preview,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{isLimit},
+			#{relation},
+			#{id},
+			#{office.id},
+			#{name},
+			#{nameEn},
+			#{nameAlias},
+			#{code},
+			#{helpCode},
+        	
+        	<if test="proClass !=null and proClass.id !='' ">
+           		 #{proClass.id},
+        	</if>
+        	<if test="proPlotAspect !=null and proPlotAspect.id !='' ">
+           		#{proPlotAspect.id},
+        	</if>			
+        	<if test="proDubbingLanguag !=null and proDubbingLanguag.id !='' ">
+           		#{proDubbingLanguag.id},
+        	</if>			
+        	<if test="proCountry !=null and proCountry.id !='' ">
+           		#{proCountry.id},
+        	</if>			
+        	<if test="proGrade !=null and proGrade.id !='' ">
+           		#{proGrade.id},
+        	</if>	
+        	<if test="proIssueYear !=null and proIssueYear.id !='' ">
+           		#{proIssueYear.id},
+        	</if>	
+        			
+			#{director},			
+			#{performer},
+			#{sort},
+			#{totalEpisode},
+			#{isPreview},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+			
+	<!--   trim prefix="SET" suffixOverrides=",">
+   				<if test="roleName != null">ROLENAME=#{roleName},</if>
+  	</trim -->			
+			
+			
+	
+	<update id="update">
+		UPDATE pro_base_info SET 
+			is_limit = #{isLimit},	
+			relation = #{relation},	
+			name = #{name},
+			name_en = #{nameEn},
+			name_alias = #{nameAlias},
+			code = #{code},
+			help_code = #{helpCode},
+
+			<if test="proPlotAspect !=null and proPlotAspect.id !='' ">
+           		 pro_plot_aspect_id = #{proPlotAspect.id},
+        	</if>
+        	
+			<if test="proClass !=null and proClass.id !='' ">
+           		 pro_class_id = #{proClass.id},
+        	</if>
+        	
+ 			<if test="proCountry !=null and proCountry.id !='' ">
+           		 pro_country_id = #{proCountry.id},
+        	</if>    
+        	   	
+ 			<if test="proGrade !=null and proGrade.id !='' ">
+           		 pro_grade_id = #{proGrade.id},
+        	</if> 
+        	 
+			<if test="proDubbingLanguag !=null and proDubbingLanguag.id !='' ">
+           		 pro_dubbing_language_id = #{proDubbingLanguag.id},
+        	</if>
+        	
+			<if test="proIssueYear !=null and proIssueYear.id !='' ">
+           		 pro_issue_year_id = #{proIssueYear.id},
+        	</if>
+
+			director = #{director},
+			performer = #{performer},
+			total_episode = #{totalEpisode},
+			is_preview = #{isPreview},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_base_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

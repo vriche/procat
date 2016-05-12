@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProCopyrightDao">
+    
+	<sql id="proCopyrightColumns">
+		a.id AS "id",
+		a.pro_base_info_id AS "proBaseInfo.id",
+		a.purchase_time AS "purchaseTime",
+		a.issue_company AS "issueCompany",
+		a.issue_date AS "issueDate",
+		a.copyright_start_date AS "copyrightStartDate",
+		a.copyright_end_date AS "copyrightEndDate",
+		a.bro_state AS "broState",
+		a.sort AS "sort",
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+				
+		a2.name AS "proBaseInfo.name"
+	</sql>
+	
+	<sql id="proCopyrightJoins">
+		LEFT JOIN pro_base_info a2 ON a2.id = a.pro_base_info_id	
+
+	</sql>
+    
+	<select id="get" resultType="ProCopyright">
+		SELECT 
+			<include refid="proCopyrightColumns"/>
+		FROM pro_copyright a
+		<include refid="proCopyrightJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProCopyright">
+		SELECT 
+			<include refid="proCopyrightColumns"/>
+		FROM pro_copyright a
+		<include refid="proCopyrightJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} 
+			
+			AND copyright_end_date is not  null and datediff(copyright_end_date, now())>0  
+			
+			<if test="proBaseInfo != null and proBaseInfo.id != null and proBaseInfo.id != ''">
+				AND a.pro_base_info_id = #{proBaseInfo.id}
+			</if>
+			<if test="beginPurchaseTime != null and endPurchaseTime != null and beginPurchaseTime != '' and endPurchaseTime != ''">
+				AND a.purchase_time BETWEEN #{beginPurchaseTime} AND #{endPurchaseTime}
+			</if>
+			<if test="issueCompany != null and issueCompany != ''">
+				AND a.issue_company = #{issueCompany}
+			</if>
+			<if test="beginIssueDate != null and endIssueDate != null and beginIssueDate != '' and endIssueDate != ''">
+				AND a.issue_date BETWEEN #{beginIssueDate} AND #{endIssueDate}
+			</if>
+		</where>
+		
+		
+			ORDER BY datediff(copyright_end_date, now())  asc
+
+	</select>
+	
+	<select id="findAllList" resultType="ProCopyright">
+		SELECT 
+			<include refid="proCopyrightColumns"/>
+		FROM pro_copyright a
+		<include refid="proCopyrightJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_copyright(
+			id,
+			pro_base_info_id,
+			purchase_time,
+			issue_company,
+			issue_date,
+			copyright_start_date,
+			copyright_end_date,
+			bro_state,
+			sort,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{proBaseInfo.id},
+			#{purchaseTime},
+			#{issueCompany},
+			#{issueDate},
+			#{copyrightStartDate},
+			#{copyrightEndDate},
+			#{broState},
+			#{sort},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pro_copyright SET 	
+			pro_base_info_id = #{proBaseInfo.id},
+			purchase_time = #{purchaseTime},
+			issue_company = #{issueCompany},
+			issue_date = #{issueDate},
+			copyright_start_date = #{copyrightStartDate},
+			copyright_end_date = #{copyrightEndDate},
+			bro_state = #{broState},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_copyright SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

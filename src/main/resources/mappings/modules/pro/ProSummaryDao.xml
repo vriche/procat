@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.pro.dao.ProSummaryDao">
+    
+	<sql id="proSummaryColumns">
+		a.id AS "id",
+		a.pro_base_info_id AS "proBaseInfo.id",
+		a.content AS "content",
+		a.poster AS "poster",
+		a.sort AS "sort",
+		a.version AS "version",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+				
+				
+		b.name AS "proBaseInfo.name"
+	</sql>
+	
+	<sql id="proSummaryJoins">
+		LEFT JOIN pro_base_info b ON b.id = a.pro_base_info_id
+	</sql>
+    
+	<select id="get" resultType="ProSummary">
+		SELECT 
+			<include refid="proSummaryColumns"/>
+		FROM pro_summary a
+		<include refid="proSummaryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProSummary">
+		SELECT 
+			<include refid="proSummaryColumns"/>
+		FROM pro_summary a
+		<include refid="proSummaryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="proBaseInfo != null and proBaseInfo.id != null and proBaseInfo.id != ''">
+				AND a.pro_base_info_id = #{proBaseInfo.id}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProSummary">
+		SELECT 
+			<include refid="proSummaryColumns"/>
+		FROM pro_summary a
+		<include refid="proSummaryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pro_summary(
+			id,
+			pro_base_info_id,
+			content,
+			poster,
+			sort,
+			version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{proBaseInfo.id},
+			#{content},
+			#{poster},
+			#{sort},
+			#{version},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pro_summary SET 	
+			pro_base_info_id = #{proBaseInfo.id},
+			content = #{content},
+			poster = #{poster},
+			sort = #{sort},
+			version = #{version},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pro_summary SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE pro_base_info_id = #{proBaseInfo.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>
