@@ -1,0 +1,14 @@
+2016/05/11
+1、在package com.thinkgem.jeesite.common.utils 下增加 IdWorker 类用于生成数字ID
+2、在package com.thinkgem.jeesite.common.utils 修改 DataEntity 的 public void preInsert() 
+   注释了
+     		setId(IdGen.uuid());
+   增加 		
+			 IdWorker worker1 = new IdWorker(1);
+			 long id = worker1.nextId();
+			 System.out.println(worker1.nextId());
+			 setId(String.valueOf(id));
+			 
+			 
+3、修改pom.xml  增加 webserver.port2=8080
+			 
